@@ -1,0 +1,119 @@
+<!DOCTYPE html> 
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Pilihan DLS dan SA</title>
+    <style>
+        /* Reset Default Browser Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body dan Struktur Umum */
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            background-image: url('dls.jpg'); /* Ganti dengan path gambar yang diinginkan */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        /* Header */
+        header {
+            background-color: rgba(0, 115, 230, 0.8); /* Warna dengan transparansi */
+            color: white;
+            padding: 10px 0;
+        }
+
+        header h1 {
+            text-align: center;
+            font-size: 2rem;
+        }
+
+        nav ul {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            padding: 0;
+        }
+
+        nav ul li {
+            margin: 0 15px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: color 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            color: #ffd700;
+        }
+
+        /* Main Content */
+        main {
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+            color: white; /* Teks berwarna putih untuk kontras */
+        }
+
+        .btn {
+            background-color: #0073e6;
+            color: white;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #005bb5;
+        }
+
+        /* Footer */
+        footer {
+            background-color: rgba(0, 115, 230, 0.8); /* Warna dengan transparansi */
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Website Pilihan DLS dan SA</h1>
+            <nav>
+                <ul>
+                    <li><a href="dls.html">DLS</a></li>
+                    <li><a href="sa.html">SA</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <button class="btn" onclick="window.location.href='dls.html'">Masuk ke DLS</button>
+        <button class="btn" onclick="window.location.href='sa.html'">Masuk ke SA</button>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Website Pilihan DLS dan SA. Semua hak cipta dilindungi.</p>
+        </div>
+    </footer>
+</body>
+</html>

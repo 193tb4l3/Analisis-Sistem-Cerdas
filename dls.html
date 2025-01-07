@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pencarian Terbatas Kedalaman</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Visualisasi Pencarian Terbatas Kedalaman</h1>
+        <p>Masukkan simpul awal, tujuan, dan batas kedalaman untuk memulai pencarian.</p>
+
+        <div class="input-section">
+            <label for="start">Simpul Awal:</label>
+            <input type="text" id="start" value="A">
+
+            <label for="goal">Simpul Tujuan:</label>
+            <input type="text" id="goal" value="G">
+
+            <label for="limit">Batas Kedalaman:</label>
+            <input type="number" id="limit" value="3">
+
+            <button onclick="mulaiPencarian()">Mulai Pencarian</button>
+        </div>
+
+        <div class="hasil" id="hasil"></div>
+
+        <canvas id="grafCanvas" width="800" height="400"></canvas>
+    </div>
+
+    <script>
+        // Representasi graf sebagai adjacency list
+        const graf = {
+            A: ['B', 'C'],
+            B: ['D', 'E'],
+            C: ['F', 'G'],
+            D: [],
+            E: [],
+            F: [],
+            G: []
+        };
+
+        // Fungsi Pencarian Terbatas Kedalaman
+        function pencarianTerbatasKedalaman(node, tujuan, batas, kedalaman = 0, jalur = []) {
+            jalur.push(node); // Tambahkan simpul saat ini ke jalur
+
+            if (node === tujuan) {
+                return jalur; // Tujuan ditemukan
+            }
+
+            if (kedalaman === batas) {
+                return null; // Batas tercapai
+            }
+
+            for (const tetangga of graf[node]) {
+                const hasil = pencarianTerbatasKedalaman(tetangga, tujuan, batas, kedalaman + 1, [...jalur]);
+                if (hasil) {
+                    return hasil; // Jalur ditemukan
+                }
+            }
+
+            return null; // Tidak ada jalur yang ditemukan dalam batas
+        }
+
+        // Fungsi untuk menggambar diagram pohon pada canvas
+        function gambarGraf(jalur) {
+            const canvas = document.getElementById('grafCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Koordinat untuk simpul
+            const koordinat = {
+                A: { x: 400, y: 50 },
+                B: { x: 200, y: 150 },
+                C: { x: 600, y: 150 },
+                D: { x: 100, y: 250 },
+                E: { x: 300, y: 250 },
+                F: { x: 500, y: 250 },
+                G: { x: 700, y: 250 }
+            };
+
+            // Gambar garis antar simpul
+            for (const [node, tetanggaList] of Object.entries(graf)) {
+                const { x: x1, y: y1 } = koordinat[node];
+                for (const tetangga of tetanggaList) {
+                    const { x: x2, y: y2 } = koordinat[tetangga];
+                    ctx.beginPath();
+                    ctx.moveTo(x1, y1);
+                    ctx.lineTo(x2, y2);
+                    ctx.strokeStyle = '#ccc';
+                    ctx.stroke();
+                }
+            }
+
+            // Gambar simpul
+            for (const [node, { x, y }] of Object.entries(koordinat)) {
+                ctx.beginPath();
+                ctx.arc(x, y, 20, 0, Math.PI * 2);
+                ctx.fillStyle = jalur.includes(node) ? 'lightgreen' : 'white';
+                ctx.fill();
+                ctx.strokeStyle = 'black';
+                ctx.stroke();
+                ctx.fillStyle = 'black';
+                ctx.font = '16px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(node, x, y);
+            }
+        }
+
+        // Mulai Pencarian dan Tampilkan Hasil
+        function mulaiPencarian() {
+            const simpulAwal = document.getElementById('start').value.trim();
+            const simpulTujuan = document.getElementById('goal').value.trim();
+            const batas = parseInt(document.getElementById('limit').value);
+
+            const hasil = pencarianTerbatasKedalaman(simpulAwal, simpulTujuan, batas);
+            const hasilDiv = document.getElementById('hasil');
+
+            if (hasil) {
+                hasilDiv.textContent = `Jalur ditemukan: ${hasil.join(' -> ')}`;
+            } else {
+                hasilDiv.textContent = `Tidak ada jalur yang ditemukan dalam batas kedalaman ${batas}.`;
+            }
+
+            gambarGraf(hasil || []);
+        }
+    </script>
+</body>
+</html>

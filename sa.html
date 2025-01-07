@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulated Annealing - Jalur Optimal</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Visualisasi Algoritma Simulated Annealing</h1>
+        <p>Masukkan lokasi awal dan tujuan untuk mencari jalur optimal menggunakan algoritma Simulated Annealing.</p>
+
+        <div class="input-section">
+            <label for="start">Lokasi Awal:</label>
+            <input type="text" id="start" placeholder="Contoh: A (Kantor DPR)" value="A">
+
+            <label for="destination">Tujuan:</label>
+            <input type="text" id="destination" placeholder="Contoh: E (Istana Presiden)" value="E">
+
+            <button onclick="mulaiSimulatedAnnealing()">Mulai Pencarian</button>
+        </div>
+
+        <div class="hasil" id="hasil"></div>
+
+        <canvas id="grafCanvas" width="800" height="400"></canvas>
+    </div>
+
+    <script>
+        const graf = {
+            "A": ["B", "C", "D", "E"],
+            "B": ["C", "D", "E"],
+            "C": ["D", "E"],
+            "D": ["E"],
+            "E": []
+        };
+
+        const koordinat = {
+            "A": { x: 100, y: 200 },
+            "B": { x: 300, y: 100 },
+            "C": { x: 300, y: 300 },
+            "D": { x: 500, y: 100 },
+            "E": { x: 700, y: 200 }
+        };
+
+        const distances = {
+            "A-B": 2,
+            "A-C": 4,
+            "A-D": 6,
+            "A-E": 8,
+            "B-C": 2,
+            "B-D": 5,
+            "B-E": 7,
+            "C-D": 3,
+            "C-E": 4,
+            "D-E": 2
+        };
+
+        function calculateDistance(path) {
+            const segments = path.split("-");
+            let totalDistance = 0;
+            for (let i = 0; i < segments.length - 1; i++) {
+                const key1 = `${segments[i]}-${segments[i + 1]}`;
+                const key2 = `${segments[i + 1]}-${segments[i]}`;
+                totalDistance += distances[key1] || distances[key2] || 0;
+            }
+            return totalDistance;
+        }
+
+        function simulatedAnnealing(start, destination) {
+            const paths = [
+                "A-B-C-D-E",
+                "A-B-D-E",
+                "A-C-D-E",
+                "A-D-E"
+            ];
+            const validPaths = paths.filter(p => p.startsWith(start) && p.endsWith(destination));
+            if (validPaths.length === 0) return null;
+
+            let currentPath = validPaths[Math.floor(Math.random() * validPaths.length)];
+            let currentDistance = calculateDistance(currentPath);
+            let temperature = 100;
+            const coolingRate = 0.95;
+
+            while (temperature > 1) {
+                const newPath = validPaths[Math.floor(Math.random() * validPaths.length)];
+                const newDistance = calculateDistance(newPath);
+
+                if (newDistance < currentDistance || Math.random() < Math.exp((currentDistance - newDistance) / temperature)) {
+                    currentPath = newPath;
+                    currentDistance = newDistance;
+                }
+
+                temperature *= coolingRate;
+            }
+
+            return { path: currentPath, distance: currentDistance };
+        }
+
+        function gambarGraf(jalur) {
+            const canvas = document.getElementById('grafCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Gambar garis antar simpul dengan jarak
+            for (const [node, tetanggaList] of Object.entries(graf)) {
+                const { x: x1, y: y1 } = koordinat[node];
+                for (const tetangga of tetanggaList) {
+                    const { x: x2, y: y2 } = koordinat[tetangga];
+                    ctx.beginPath();
+                    ctx.moveTo(x1, y1);
+                    ctx.lineTo(x2, y2);
+                    ctx.strokeStyle = '#ccc';
+                    ctx.stroke();
+
+                    // Tampilkan jarak pada setiap rute
+                    const distance = distances[`${node}-${tetangga}`] || distances[`${tetangga}-${node}`];
+                    const midX = (x1 + x2) / 2;
+                    const midY = (y1 + y2) / 2;
+                    ctx.fillStyle = 'black';
+                    ctx.font = '12px Arial';
+                    ctx.fillText(`${distance} km`, midX, midY);
+                }
+            }
+
+            // Gambar simpul
+            for (const [node, { x, y }] of Object.entries(koordinat)) {
+                ctx.beginPath();
+                ctx.arc(x, y, 20, 0, Math.PI * 2);
+                ctx.fillStyle = jalur.includes(node) ? 'lightgreen' : 'white';
+                ctx.fill();
+                ctx.strokeStyle = 'black';
+                ctx.stroke();
+                ctx.fillStyle = 'black';
+                ctx.font = '16px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(node, x, y);
+            }
+        }
+
+        function mulaiSimulatedAnnealing() {
+            const start = document.getElementById("start").value;
+            const destination = document.getElementById("destination").value;
+
+            if (!start || !destination) {
+                alert("Harap isi lokasi awal dan tujuan.");
+                return;
+            }
+
+            const hasil = simulatedAnnealing(start, destination);
+            const hasilDiv = document.getElementById("hasil");
+
+            if (!hasil) {
+                hasilDiv.textContent = "Rute tidak ditemukan!";
+                gambarGraf([]);
+                return;
+            }
+
+            hasilDiv.textContent = `Rute optimal: ${hasil.path} (Jarak: ${hasil.distance} km)`;
+            gambarGraf(hasil.path.split("-"));
+        }
+    </script>
+</body>
+</html>
